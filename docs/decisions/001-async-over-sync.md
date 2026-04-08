@@ -1,27 +1,27 @@
-# ADR-001: Asynchronous Pipeline Over Synchronous Processing
+# ADR-001: 동기 처리 대신 비동기 파이프라인 선택
 
-## Status
-Accepted
+## 상태
+승인됨
 
-## Context
-Documents submitted for analysis may take variable time to process (milliseconds for mock, seconds for heuristic, minutes for ML models). The system needs to handle concurrent submissions without blocking API resources.
+## 배경
+분석을 위해 제출된 문서는 처리 시간이 가변적입니다 (mock은 밀리초, 휴리스틱은 수 초, ML 모델은 수 분). 시스템은 API 리소스를 차단하지 않으면서 동시 제출을 처리할 수 있어야 합니다.
 
-## Decision
-Use an asynchronous job pipeline: the API accepts the document immediately (202 Accepted), creates a job, and dispatches it to a worker. The client polls for results.
+## 결정
+비동기 Job 파이프라인을 사용합니다: API가 문서를 즉시 수락(202 Accepted)하고, Job을 생성한 뒤, Worker에 dispatch합니다. 클라이언트는 결과를 폴링합니다.
 
-## Consequences
+## 결과
 
-**Positive:**
-- API response time is constant regardless of analysis duration
-- Workers scale independently of the API
-- Failed analyses don't affect API availability
-- Natural retry mechanism via job re-dispatch
+**긍정적:**
+- 분석 시간과 관계없이 API 응답 시간이 일정
+- Worker가 API와 독립적으로 스케일링
+- 분석 실패가 API 가용성에 영향을 주지 않음
+- Job 재dispatch를 통한 자연스러운 재시도 메커니즘
 
-**Negative:**
-- Clients must poll or use webhooks for completion notification
-- More complex than a synchronous endpoint
-- Requires job state management and lifecycle tracking
+**부정적:**
+- 클라이언트가 완료 알림을 위해 폴링 또는 웹훅을 사용해야 함
+- 동기 엔드포인트보다 복잡함
+- Job 상태 관리 및 수명주기 추적이 필요
 
-**Trade-offs accepted:**
-- Polling latency (client sees results after next poll, not immediately)
-- Operational complexity of managing two services
+**수용한 트레이드오프:**
+- 폴링 지연 (클라이언트가 즉시가 아닌 다음 폴링에서 결과를 확인)
+- 두 개 서비스 운영의 복잡성
