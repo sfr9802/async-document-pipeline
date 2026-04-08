@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: pipeline
+      POSTGRES_USER: pipeline
+      POSTGRES_PASSWORD: pipeline
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pipeline"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  core-api:
+    build: ./core-api
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/pipeline
+      SPRING_DATASOURCE_USERNAME: pipeline
+      SPRING_DATASOURCE_PASSWORD: pipeline
+      APP_QUEUE_DISPATCH_MODE: http
+      APP_WORKER_URL: http://worker:8000/internal/tasks/analyze
+      APP_CALLBACK_URL: http://core-api:8082/internal/jobs/callbacks
+      APP_INTERNAL_SHARED_SECRET: local-dev-secret
+      APP_STORAGE_ROOT_DIR: /data/artifacts
+    volumes:
+      - artifacts:/data/artifacts
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  worker:
+    build: ./worker
+    ports:
+      - "8000:8000"
+    environment:
+      ANALYSIS_PROVIDER: local
+      CORE_CLAIM_URL: http://core-api:8082/internal/jobs/claim
+      CORE_CLAIM_STUB_MODE: "false"
+      CORE_CLAIM_TIMEOUT_SECONDS: "5.0"
+      CALLBACK_STUB_MODE: "false"
+      CALLBACK_TIMEOUT_SECONDS: "5.0"
+      CALLBACK_MAX_ATTEMPTS: "3"
+      CALLBACK_RETRY_BACKOFF_SECONDS: "1.0"
+      STORAGE_BACKEND: filesystem
+      STORAGE_BASE_DIR: /data/artifacts
+      INTERNAL_SHARED_SECRET: local-dev-secret
+    volumes:
+      - artifacts:/data/artifacts
+    depends_on:
+      - core-api
+
+volumes:
+  pgdata:
+  artifacts:

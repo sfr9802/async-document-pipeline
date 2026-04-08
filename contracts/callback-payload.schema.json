@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkerCallbackPayload",
+  "description": "Payload sent from worker back to core-api upon job completion (success or failure).",
+  "type": "object",
+  "required": [
+    "requestId",
+    "callbackId",
+    "jobId",
+    "workerRunId",
+    "status",
+    "attemptNumber",
+    "pipelineVersion",
+    "artifacts",
+    "completedAt"
+  ],
+  "properties": {
+    "requestId": {
+      "type": "string"
+    },
+    "callbackId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique callback ID for idempotent processing. Duplicate callbackIds with the same payload hash are accepted; different payloads for the same callbackId are rejected (409)."
+    },
+    "jobId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "documentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "workerRunId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The run ID assigned during claim. Used to correlate callback with the correct execution."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["SUCCEEDED", "FAILED"]
+    },
+    "attemptNumber": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "pipelineVersion": {
+      "type": "string"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["artifactType", "objectKey", "contentType", "fileName", "sizeBytes"],
+        "properties": {
+          "artifactType": {
+            "type": "string",
+            "description": "e.g., REPORT_JSON, REPORT_HTML"
+          },
+          "objectKey": {
+            "type": "string",
+            "description": "Storage path: jobs/{jobId}/attempts/{n}/artifacts/{type}/{fileName}"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "fileName": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "integer"
+          },
+          "checksumSha256": {
+            "type": ["string", "null"]
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": ["string", "null"],
+      "description": "Human-readable summary of the analysis result."
+    },
+    "completedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "error": {
+      "type": ["object", "null"],
+      "properties": {
+        "code": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+    "executionMetadata": {
+      "type": "object",
+      "properties": {
+        "workerRunId": { "type": "string" },
+        "providerName": { "type": "string" },
+        "durationMs": { "type": "integer" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

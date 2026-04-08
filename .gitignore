@@ -1,0 +1,35 @@
+# Java / Gradle
+core-api/.gradle/
+core-api/**/build/
+core-api/gradle/wrapper/gradle-wrapper.jar
+*.class
+*.jar
+*.war
+
+# Python
+worker/__pycache__/
+worker/**/__pycache__/
+worker/.venv/
+worker/*.egg-info/
+*.pyc
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+
+# Artifacts (local storage)
+artifacts/
+.local-storage/
+
+# Docker
+docker-compose.override.yml

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AnalyzeTaskDispatchPayload",
+  "description": "Payload sent from core-api to worker when dispatching a document analysis job.",
+  "type": "object",
+  "required": [
+    "requestId",
+    "jobId",
+    "documentId",
+    "pipelineVersion",
+    "attemptNumber",
+    "idempotencyKey",
+    "callbackUrl",
+    "inputStoragePath"
+  ],
+  "properties": {
+    "requestId": {
+      "type": "string",
+      "description": "Unique request identifier for tracing."
+    },
+    "jobId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The job to process."
+    },
+    "documentId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The source document."
+    },
+    "pipelineVersion": {
+      "type": "string",
+      "description": "Pipeline version string (e.g., 'v1')."
+    },
+    "attemptNumber": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Current execution attempt (1-based)."
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "description": "Deterministic key for exactly-once claim semantics."
+    },
+    "callbackUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to POST the completion callback to."
+    },
+    "inputStoragePath": {
+      "type": "string",
+      "description": "Object key / path to the input document in shared storage."
+    }
+  },
+  "additionalProperties": false
+}

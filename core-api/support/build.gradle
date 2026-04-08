@@ -1,0 +1,3 @@
+dependencies {
+    // Minimal — no Spring needed for utilities
+}

@@ -1,0 +1,22 @@
+[project]
+name = "document-analysis-worker"
+version = "0.1.0"
+description = "Stateless document analysis worker for the async pipeline"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
+    "pydantic>=2.11.0",
+    "pydantic-settings>=2.7.0",
+    "httpx>=0.28.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.28.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
